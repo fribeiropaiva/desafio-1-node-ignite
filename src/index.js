@@ -122,6 +122,4 @@ app.delete("/todos/:id", checkIfUserExists, (request, response) => {
   return response.status(204).json();
 });
 
-// app.listen(3000);
-
 module.exports = app;
