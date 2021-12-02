@@ -3,7 +3,7 @@ const cors = require('cors');
 const { v4: uuidv4 } = require('uuid');
 const app = express();
 
-app.use(cors);
+// app.use(cors);
 app.use(express.json());
 
 const users = [];
@@ -21,7 +21,7 @@ function checkIfUserExists(request, response, next) {
   return next();
 }
 
-app.post("/users", checkIfUserExists, (request, response) => {
+app.post("/users", (request, response) => {
   const { name, username } = request.body;
 
   const userExists = users.some(user => user.username === username);
@@ -39,7 +39,7 @@ app.post("/users", checkIfUserExists, (request, response) => {
 
   users.push(newUser);
 
-  return response.status(201).json(user);
+  return response.status(201).json(newUser);
 });
 
 app.get("/todos", checkIfUserExists, (request, response) => {
@@ -104,15 +104,24 @@ app.patch("/todos/:id/done", checkIfUserExists, (request, response) => {
 
 app.delete("/todos/:id", checkIfUserExists, (request, response) => {
   const { user } = request;
+  const { id } = request.params;
 
-  const todoToDelete = user.todos.find(todo => todo.id === id);
+  console.log(id)
 
-  if (todoToDelete) {
-    user.todos.splice(todoToDelete, 1);
-    return response.status(200);
-  } else {
+  console.log(user)
+  const todoIndex = user.todos.findIndex(todo => todo.id === id);
+
+  console.log(todoIndex)
+
+  if (todoIndex === -1) {
     return response.status(404).json({ error: "Todo not found" });
   }
-})
+
+  user.todos.splice(todoIndex, 1);
+
+  return response.status(204).json();
+});
+
+// app.listen(3000);
 
 module.exports = app;
